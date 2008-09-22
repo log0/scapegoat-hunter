@@ -60,6 +60,7 @@ def check_proxys(test_url, nmap_log_file):
 
             for open_port in open_ports:
                 port = open_port.split('/')[0]
+                print 'Checking %s:%s' % (ip, port)
                 if check_proxy(ip, port, test_url, test_data):
                     proxys.append( {'ip':ip, 'port':port, 'user':'', 'pass':''} )
 
@@ -98,11 +99,11 @@ def check_proxy(ip, port, test_url, test_data):
         url_sock = opener.open(test_url)
         url_data = url_sock.read()
     except URLError, e:
-        print e
+        print 'check_proxy : %s' % (e)
     except HTTPError, e:
-        print e
+        print 'check_proxy : %s' % (e)
     except:
-        print 'Other Error '
+        print 'check_proxy : Other Error '
 
     # Fail early!
     if url_data == '':
@@ -133,7 +134,7 @@ if __name__ == '__main__':
     verbose = op.verbose
 
     if not op.target:
-        target = '-iR 100'
+        target = '-iR 1000'
 
     nmap_args = {}
     nmap_args['ip'] = target
@@ -141,5 +142,10 @@ if __name__ == '__main__':
     nmap_args['verbose'] = verbose
     nmap_args['output'] = '.log.tmp'
 
+    print 'Execute Nmap...'
     run_nmap(nmap_args)
-    check_proxys(op.url, nmap_args['output'])
+
+    print 'Verify results from Nmap...'
+    proxys = check_proxys(op.url, nmap_args['output'])
+    for proxy in proxys:
+        print 'http://%(user)s:%(pass)s@%(ip)s:%(port)s' % (proxy)

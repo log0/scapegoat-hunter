@@ -53,6 +53,13 @@ def check_proxys(test_url, nmap_log_file):
 
     log_data = [ i.rstrip() for i in open(nmap_log_file, 'r').readlines() ]
 
+    hosts = 0
+    for line in log_data:
+        if r_ip.search(line):
+            hosts += 1
+
+    print 'Active hosts : %d' % (hosts)
+
     for line in log_data:
         if r_open_port.search(line):
             open_ports = r_open_port.findall(line)
@@ -123,6 +130,7 @@ if __name__ == '__main__':
     optparser.add_option('-p', '--port', dest='port', help='Port range to scan, in nmap format. Default is 80,3128,8080', default='80,3128,8080')
     optparser.add_option('-q', '--quiet', action='store_false', dest='verbose', help='No output from nmap.', default=True)
     optparser.add_option('-u', '--url', dest='url', help='URL to validate proxy against, default is http://chioka.in/wp-content/themes/girl/style.css', default='http://chioka.in/wp-content/themes/girl/style.css')
+    optparser.add_option('-r', '--randhost', dest='randhost', help='Number of hosts to scan while doing random scan. Default 1000', default=1000)
 
     (op, args) = optparser.parse_args()
 
@@ -134,7 +142,10 @@ if __name__ == '__main__':
     verbose = op.verbose
 
     if not op.target:
-        target = '-iR 1000'
+        if not op.randhost:
+            target = '-iR 1000'
+        else:
+            target = '-iR %s' % (op.randhost)
 
     nmap_args = {}
     nmap_args['ip'] = target

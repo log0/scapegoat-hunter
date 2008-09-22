@@ -22,6 +22,13 @@ def run_nmap(args):
     #print cmd
     os.system(cmd)
 
+'''
+def check_proxys
+@test_url       - The URL to use as a control to verify proxy data in function check_proxy
+@nmap_log_file  - The path to the nmap log file with results
+Returns:
+A List of proxies in form of {'ip':ip, 'port':port, 'user':user, 'pass':pass } for parsing.
+'''
 def check_proxys(test_url, nmap_log_file):
 
     # IP regex 
@@ -61,8 +68,18 @@ def check_proxys(test_url, nmap_log_file):
 
     return proxys
 
+'''
+def check_proxy
+@ip          - The IP of the host to test as a proxy
+@port        - The port of the host to test as a proxy
+@test_url    - The URL to test without proxy for verification
+@test_data   - The URL data fetched without proxy at test_url
+
+Returns:
+True - If the ip:port is a proxy
+False - Otherwise, or error
+'''
 def check_proxy(ip, port, test_url, test_data):
-    #print 'Checking %s:%s' % ( ip, port)
 
     proxy_info = {
         'user' : '',
@@ -74,31 +91,28 @@ def check_proxy(ip, port, test_url, test_data):
     proxy_dict = {'http':'%(user)s:%(pass)s@%(host)s:%(port)s' % (proxy_info)}
     proxy_handler = ProxyHandler(proxy_dict)
 
+    url_data = ''
+
     try:
         opener = build_opener(proxy_handler, HTTPHandler)
         url_sock = opener.open(test_url)
         url_data = url_sock.read()
     except URLError, e:
         print e
-        return
     except HTTPError, e:
         print e
-        return
     except:
         print 'Other Error '
-        return
 
-    if url_data == test_data:
-        #print 'Good Proxy : %(user)s:%(pass)s@%(host)s:%(port)s' % (proxy_info)
-        return True
-    else:
-        #print '=========='
-        #print url_data
-        #print '=========='
-        #print test_data
-        #print '=========='
-        #print 'Bad Proxy : %(user)s:%(pass)s@%(host)s:%(port)s' % (proxy_info)
+    # Fail early!
+    if url_data == '':
         return False
+
+    # TODO: Can do fuzzy string search to detect injection proxy
+    if url_data != test_data:
+        return False
+
+    return True
 
 
 if __name__ == '__main__':

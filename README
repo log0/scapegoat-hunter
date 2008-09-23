@@ -1,0 +1,12 @@
+Project : Scapegoat Hunter
+Author : Log0
+Contact : ky.log0@gmail.com
+
+This is a wrapper to Nmap. It is used scan ip ranges to locate proxies that can be used
+for auditing purposes. Or can be used for hunting out "scapegoats" for doing crimes, or
+reaching into certain filtered areas.
+
+The code currently can find proxies that works, but does not identify the type of
+proxy the IP is. And this cannot identify proxy that injects code, which means for
+proxies that modify the HTTP source or has a "welcome" screen, the script cannot
+yet detect them.
